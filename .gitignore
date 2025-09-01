@@ -1,0 +1,119 @@
+# ========================================
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ========================================
+# NUNCA subir credenciales de base de datos
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+
+# ========================================
+# ARCHIVOS DEL SISTEMA
+# ========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ========================================
+# LOGS Y ARCHIVOS TEMPORALES
+# ========================================
+*.log
+logs/
+error.log
+access.log
+*.bak
+*.backup
+*.old
+
+# ========================================
+# ARCHIVOS DE IDE Y EDITORES
+# ========================================
+.vscode/
+.idea/
+*.sublime-*
+.vscode/settings.json
+
+# ========================================
+# DEPENDENCIAS Y MÓDULOS
+# ========================================
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================================
+# ARCHIVOS DE CONFIGURACIÓN LOCAL
+# ========================================
+.htaccess.local
+config.local.php
+*.local.php
+
+# ========================================
+# ARCHIVOS DE BASE DE DATOS
+# ========================================
+*.sql.backup
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================================
+# ARCHIVOS DE CACHÉ Y SESIONES
+# ========================================
+cache/
+*.cache
+sessions/
+tmp/
+
+# ========================================
+# ARCHIVOS DE DEPLOYMENT
+# ========================================
+windsurf_deployment.yaml
+.netlify/
+
+# ========================================
+# IMÁGENES SUBIDAS POR USUARIOS
+# ========================================
+# Mantener la estructura pero ignorar contenido
+imagenes/*.jpeg
+imagenes/*.jpg
+imagenes/*.png
+imagenes/*.gif
+imagenes/*.webp
+imagenes/*.bmp
+imagenes/*.tiff
+
+# Pero mantener archivos de ejemplo si existen
+!imagenes/ejemplo*
+!imagenes/.gitkeep
+
+# ========================================
+# ARCHIVOS DE SISTEMA WINDOWS
+# ========================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ========================================
+# ARCHIVOS DE SISTEMA MAC
+# ========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ========================================
+# ARCHIVOS DE SISTEMA LINUX
+# ========================================
+*~
+.directory
+.Trash-*

@@ -4,14 +4,49 @@
  * Base de datos para la aplicación de Fiesta de Quince Años
  */
 
+// Cargar variables de entorno
+function cargarEnv($archivo = '.env') {
+    if (!file_exists($archivo)) {
+        return;
+    }
+    
+    $lineas = file($archivo, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lineas as $linea) {
+        if (strpos(trim($linea), '#') === 0) {
+            continue; // Ignorar comentarios
+        }
+        
+        list($nombre, $valor) = explode('=', $linea, 2);
+        $nombre = trim($nombre);
+        $valor = trim($valor);
+        
+        if (!array_key_exists($nombre, $_ENV)) {
+            $_ENV[$nombre] = $valor;
+        }
+    }
+}
+
+// Cargar el archivo .env
+cargarEnv();
+
 class BaseDatos {
-    private $servidor = 'localhost';
-    private $nombre_bd = 'fiesta_quince';
-    private $usuario = 'root';
-    private $contrasena = '';
+    private $servidor;
+    private $nombre_bd;
+    private $usuario;
+    private $contrasena;
     private $conexion;
 
     public function __construct() {
+        // Usar variables de entorno o valores por defecto
+        $this->servidor = $_ENV['DB_HOST'] ?? 'localhost';
+        $this->nombre_bd = $_ENV['DB_NAME'] ?? 'fiesta_quince';
+        $this->usuario = $_ENV['DB_USER'] ?? 'root';
+        $this->contrasena = $_ENV['DB_PASS'] ?? '';
+        
+        $this->conectar();
+    }
+
+    private function conectar() {
         try {
             $dsn = "mysql:host={$this->servidor};dbname={$this->nombre_bd};charset=utf8mb4";
             $this->conexion = new PDO($dsn, $this->usuario, $this->contrasena);
