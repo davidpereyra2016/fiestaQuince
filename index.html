@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuerdos de Mis 15 Años</title>
+    
+    <!-- Tailwind CSS para un diseño moderno y adaptable -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Biblioteca para generar el Código QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Animación para las imágenes de la galería */
+        .gallery-item {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Estilo para el input de archivo personalizado */
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+        .custom-file-input::before {
+            content: 'Seleccionar foto';
+            display: inline-block;
+            background: linear-gradient(to right, #ec4899, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            outline: none;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+        }
+        .custom-file-input:hover::before {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center transition-all duration-500">
+
+    <!-- Vista Principal: Carga de Fotos -->
+    <div id="upload-view" class="w-full max-w-md mx-auto p-6 md:p-8">
+        <div class="text-center">
+            <!-- Puedes reemplazar esta imagen por una foto de la quinceañera -->
+            <img src="imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg" alt="Foto de la Quinceañera" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-pink-500 shadow-lg">
+            
+            <h1 class="text-4xl font-bold text-pink-400">¡Mis 15 Años!</h1>
+            <p class="text-gray-300 mt-2 mb-8">¡Gracias por celebrar conmigo! Comparte tus mejores momentos de la fiesta.</p>
+
+            <div class="space-y-4">
+                <input type="file" id="photo-input" accept="image/*" class="custom-file-input block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                <input type="text" id="name-input" placeholder="Tu nombre (opcional)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                <button id="upload-button" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                    Subir Momento
+                </button>
+            </div>
+            
+            <div id="loading-spinner" class="hidden mt-4">
+                <svg class="animate-spin h-8 w-8 text-pink-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-sm text-gray-400 mt-2">Subiendo foto...</p>
+            </div>
+
+            <p id="feedback-message" class="mt-4 text-green-400 h-5"></p>
+
+            <button id="show-gallery-button" class="mt-8 w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105">
+                Ver Galería de Momentos
+            </button>
+            
+             <!-- Sección para generar el QR -->
+            <div class="mt-10 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h3 class="font-semibold text-lg mb-2">Para Imprimir el QR</h3>
+                <p class="text-sm text-gray-400 mb-4">Usa este botón para generar el QR de esta página. Luego, haz clic derecho sobre él para guardarlo e imprimirlo.</p>
+                <button id="generate-qr-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Generar mi QR</button>
+                <div id="qrcode-container" class="mt-4 flex justify-center p-4 bg-white rounded-lg hidden">
+                    <div id="qrcode"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista de la Galería -->
+    <div id="gallery-view" class="hidden w-full h-full p-4 md:p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-pink-400">Galería de Momentos</h1>
+                <button id="back-to-upload-button" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
+                    Subir Otra Foto
+                </button>
+            </div>
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <!-- Las imágenes se insertarán aquí dinámicamente -->
+            </div>
+            <div id="no-photos-message" class="hidden text-center py-20">
+                <p class="text-gray-400">Aún no se han subido fotos. ¡Sé el primero!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para ver imagen en pantalla completa -->
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <img id="modal-img" src="" class="max-w-full max-h-full rounded-lg shadow-2xl" alt="Vista ampliada">
+        <button id="close-modal-button" class="absolute top-4 right-4 text-white text-5xl font-bold">&times;</button>
+    </div>
+
+    <!-- Sistema con MySQL y PHP -->
+    <script>
+        // ===================================================================================
+        // CONFIGURACIÓN PARA MYSQL CON PHP
+        // La aplicación ahora usa una base de datos MySQL local con PDO
+        // Las imágenes se guardan en la carpeta 'imagenes/' del servidor
+        // ===================================================================================
+
+
+        // Referencias a elementos del DOM
+        const uploadView = document.getElementById('upload-view');
+        const galleryView = document.getElementById('gallery-view');
+        const showGalleryButton = document.getElementById('show-gallery-button');
+        const backToUploadButton = document.getElementById('back-to-upload-button');
+        const uploadButton = document.getElementById('upload-button');
+        const photoInput = document.getElementById('photo-input');
+        const nameInput = document.getElementById('name-input');
+        const galleryGrid = document.getElementById('gallery-grid');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const noPhotosMessage = document.getElementById('no-photos-message');
+        const imageModal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        const closeModalButton = document.getElementById('close-modal-button');
+        
+        // Lógica de navegación entre vistas
+        const mostrarGaleria = () => {
+            uploadView.classList.add('hidden');
+            galleryView.classList.remove('hidden');
+            cargarGaleria(); // Cargar fotos al mostrar galería
+        };
+
+        const mostrarSubidor = () => {
+            galleryView.classList.add('hidden');
+            uploadView.classList.remove('hidden');
+        };
+
+        showGalleryButton.addEventListener('click', mostrarGaleria);
+        backToUploadButton.addEventListener('click', mostrarSubidor);
+
+        // Lógica para subir fotos con MySQL
+        uploadButton.addEventListener('click', async () => {
+            const archivo = photoInput.files[0];
+            const nombreInvitado = nameInput.value.trim() || 'Anónimo';
+
+            if (!archivo) {
+                mostrarMensaje("Por favor, selecciona una foto primero.", true);
+                return;
+            }
+
+            loadingSpinner.classList.remove('hidden');
+            uploadButton.disabled = true;
+            uploadButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const formData = new FormData();
+                formData.append('foto', archivo);
+                formData.append('nombre_invitado', nombreInvitado);
+
+                const respuesta = await fetch('api.php?accion=subir_foto', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const resultado = await respuesta.json();
+
+                if (resultado.exito) {
+                    mostrarMensaje("¡Foto subida con éxito!", false);
+                    photoInput.value = '';
+                    nameInput.value = '';
+                    // Recargar galería si está visible
+                    if (!galleryView.classList.contains('hidden')) {
+                        cargarGaleria();
+                    }
+                } else {
+                    throw new Error(resultado.error);
+                }
+
+            } catch (error) {
+                console.error("Error al subir la foto:", error);
+                mostrarMensaje(error.message || "Hubo un error al subir la foto.", true);
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                uploadButton.disabled = false;
+                uploadButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Función para mostrar mensajes de feedback
+        function mostrarMensaje(mensaje, esError = false) {
+            feedbackMessage.textContent = mensaje;
+            feedbackMessage.style.color = esError ? '#f87171' : '#4ade80'; // Rojo o Verde
+            setTimeout(() => {
+                feedbackMessage.textContent = '';
+            }, 3000);
+        }
+
+        // Función para cargar la galería desde MySQL
+        async function cargarGaleria() {
+            try {
+                const respuesta = await fetch('api.php?accion=obtener_galeria');
+                const resultado = await respuesta.json();
+
+                if (resultado.exito) {
+                    const fotos = resultado.datos.fotos;
+                    
+                    if (fotos.length === 0) {
+                        noPhotosMessage.classList.remove('hidden');
+                        galleryGrid.innerHTML = '';
+                    } else {
+                        noPhotosMessage.classList.add('hidden');
+                        galleryGrid.innerHTML = ''; // Limpiar la galería
+
+                        fotos.forEach(foto => {
+                            const fotoElemento = document.createElement('div');
+                            fotoElemento.className = 'gallery-item relative aspect-square bg-gray-800 rounded-lg overflow-hidden cursor-pointer group';
+                            
+                            const img = document.createElement('img');
+                            img.src = foto.url_completa;
+                            img.alt = `Foto de ${foto.nombre_invitado}`;
+                            img.className = 'w-full h-full object-cover transition-transform duration-300 group-hover:scale-110';
+                            
+                            const overlay = document.createElement('div');
+                            overlay.className = 'absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end p-2';
+                            
+                            const nombreInvitado = document.createElement('p');
+                            nombreInvitado.className = 'text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300';
+                            nombreInvitado.textContent = foto.nombre_invitado;
+
+                            overlay.appendChild(nombreInvitado);
+                            fotoElemento.appendChild(img);
+                            fotoElemento.appendChild(overlay);
+                            
+                            fotoElemento.addEventListener('click', () => abrirModal(foto.url_completa));
+                            
+                            galleryGrid.appendChild(fotoElemento);
+                        });
+                    }
+                } else {
+                    throw new Error(resultado.error);
+                }
+
+            } catch (error) {
+                console.error("Error al cargar la galería:", error);
+                mostrarMensaje("Error al cargar las fotos.", true);
+            }
+        }
+
+        // Lógica del Modal
+        function abrirModal(urlImagen) {
+            modalImg.src = urlImagen;
+            imageModal.classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            imageModal.classList.add('hidden');
+            modalImg.src = '';
+        }
+
+        closeModalButton.addEventListener('click', cerrarModal);
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                cerrarModal();
+            }
+        });
+        
+        // Lógica del generador de QR con MySQL
+        const generateQrButton = document.getElementById('generate-qr-button');
+        const qrcodeContainer = document.getElementById('qrcode-container');
+        const qrcodeDiv = document.getElementById('qrcode');
+        let qrGenerado = false;
+        
+        // Verificar si ya hay un QR activo al cargar la página
+        window.addEventListener('load', async () => {
+            try {
+                const url = window.location.href;
+                const respuesta = await fetch(`api.php?accion=verificar_qr&url=${encodeURIComponent(url)}`);
+                const resultado = await respuesta.json();
+                
+                if (resultado.exito && resultado.datos.qr_activo) {
+                    // Si ya hay un QR activo, ocultar el botón de generar
+                    generateQrButton.style.display = 'none';
+                    qrGenerado = true;
+                }
+            } catch (error) {
+                console.error("Error al verificar QR:", error);
+            }
+        });
+        
+        generateQrButton.addEventListener('click', async () => {
+            if (qrGenerado) return;
+            
+            const url = window.location.href;
+            
+            try {
+                // Registrar el QR en la base de datos
+                const formData = new FormData();
+                formData.append('url', url);
+                
+                const respuesta = await fetch('api.php?accion=generar_qr', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const resultado = await respuesta.json();
+                
+                if (resultado.exito) {
+                    // Generar el QR visualmente
+                    qrcodeDiv.innerHTML = ''; // Limpiar QR anterior
+                    new QRCode(qrcodeDiv, {
+                        text: url,
+                        width: 128,
+                        height: 128,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    qrcodeContainer.classList.remove('hidden');
+                    
+                    // Ocultar el botón después de generar
+                    generateQrButton.style.display = 'none';
+                    qrGenerado = true;
+                    
+                    // Marcar como usado después de 30 segundos (opcional)
+                    setTimeout(async () => {
+                        try {
+                            const formDataUso = new FormData();
+                            formDataUso.append('url', url);
+                            await fetch('api.php?accion=marcar_qr_usado', {
+                                method: 'POST',
+                                body: formDataUso
+                            });
+                        } catch (error) {
+                            console.error("Error al marcar QR como usado:", error);
+                        }
+                    }, 30000);
+                    
+                } else {
+                    throw new Error(resultado.error);
+                }
+                
+            } catch (error) {
+                console.error("Error al generar QR:", error);
+                mostrarMensaje("Error al generar el código QR.", true);
+            }
+        });
+    </script>
+</body>
+</html>
+
