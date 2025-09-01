@@ -5,7 +5,7 @@
  */
 
 class BaseDatos {
-    private $servidor = 'srv1436.hstgr.io';
+    private $servidor = 'localhost';
     private $nombre_bd = 'fiesta_quince';
     private $usuario = 'root';
     private $contrasena = '';
