@@ -3,17 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuerdos de Mis 15 Años</title>
+    <title>Recuerdos de Mis 15 - Cami Fest</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <!-- Fuente para el título -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
     <style>
         /* Estilos personalizados */
         body {
             font-family: 'Inter', sans-serif;
+            /* Fondo animado para un look más dinámico */
+            background: linear-gradient(-45deg, #1f2937, #db2777, #111827, #8b5cf6);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
         }
+
+        /* Animación del fondo */
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Fuente especial para el título */
+        .font-celebration {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Animación de entrada para el contenido principal */
+        .content-entry {
+            animation: content-fade-in 1s ease-out forwards;
+        }
+        @keyframes content-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Animación de pulso para el botón principal para llamar la atención */
+        .pulsing-button {
+            animation: pulse-animation 2.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+
+        @keyframes pulse-animation {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 15px rgba(236, 72, 153, 0);
+            }
+        }
+
         /* Animación para las imágenes de la galería */
         .gallery-item {
             animation: fadeIn 0.5s ease-in-out;
@@ -50,31 +103,153 @@
 
         /* Estilo para la imagen del modal */
         #modal-img {
-            max-height: 90vh; /* Ajusta la altura máxima al 90% del viewport height */
-            max-width: 90vw;  /* Ajusta el ancho máximo al 90% del viewport width */
-            width: auto;      /* Permite que el ancho se ajuste automáticamente */
-            height: auto;     /* Permite que la altura se ajuste automáticamente */
-            object-fit: contain; /* Asegura que la imagen completa sea visible */
+            max-height: 90vh;
+            max-width: 90vw;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* --- Estilos de Mariposas Mejorados --- */
+        .butterfly-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .butterfly {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            transform-origin: center;
+            z-index: 10;
+        }
+
+        .butterfly-wing {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            overflow: hidden;
+            transform-origin: right center;
+        }
+
+        .butterfly-wing.left {
+            left: 0;
+            transform-origin: right center;
+        }
+
+        .butterfly-wing.right {
+            right: 0;
+            transform-origin: left center;
+        }
+
+        .wing-shape {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+        }
+
+        .butterfly-body {
+            position: absolute;
+            width: 10%;
+            height: 15%;
+            background: #333;
+            border-radius: 50%;
+            top: 42.5%;
+            left: 45%;
+        }
+
+        .butterfly-head {
+            position: absolute;
+            width: 8%;
+            height: 8%;
+            background: #333;
+            border-radius: 50%;
+            top: 38%;
+            left: 46%;
+        }
+
+        @keyframes flap {
+            0%, 100% { transform: rotate(0deg) scaleY(1); }
+            50% { transform: rotate(70deg) scaleY(0.8); }
+        }
+
+        /* Rutas de vuelo más naturales */
+        @keyframes fly-path-1 {
+            0% { left: -5%; top: 20%; opacity: 0; transform: scale(0.7) rotate(5deg); }
+            10% { opacity: 0.8; }
+            40% { top: 15%; }
+            70% { top: 25%; }
+            90% { opacity: 0.8; }
+            100% { left: 105%; top: 30%; opacity: 0; transform: scale(0.7) rotate(-5deg); }
+        }
+
+        @keyframes fly-path-2 {
+            0% { left: -5%; top: 60%; opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            10% { opacity: 0.7; }
+            40% { top: 55%; }
+            70% { top: 65%; }
+            90% { opacity: 0.7; }
+            100% { left: 105%; top: 50%; opacity: 0; transform: scale(0.5) rotate(5deg); }
+        }
+
+        @keyframes fly-path-3 {
+            0% { left: 105%; top: 80%; opacity: 0; transform: scale(0.8) rotate(5deg); }
+            10% { opacity: 0.9; }
+            40% { top: 75%; }
+            70% { top: 85%; }
+            90% { opacity: 0.9; }
+            100% { left: -5%; top: 70%; opacity: 0; transform: scale(0.8) rotate(-5deg); }
+        }
+
+        @keyframes fly-path-4 {
+            0% { left: 50%; top: 105%; opacity: 0; transform: scale(0.6) rotate(0deg); }
+            10% { opacity: 0.8; }
+            40% { left: 45%; }
+            70% { left: 55%; }
+            90% { opacity: 0.8; }
+            100% { left: 40%; top: -5%; opacity: 0; transform: scale(0.6) rotate(10deg); }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center transition-all duration-500">
+<body class="text-white min-h-screen flex items-center justify-center transition-all duration-500">
 
-    <div id="upload-view" class="w-full max-w-md mx-auto p-6 md:p-8">
+    <!-- Contenedor de Mariposas -->
+    <div class="butterfly-container">
+        <!-- Las mariposas se generarán dinámicamente con JavaScript -->
+    </div>
+
+    <div id="upload-view" class="w-full max-w-md mx-auto p-6 md:p-8 content-entry relative z-20">
         <div class="text-center">
-            <img id="imagen-quinceañera" src="imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg" alt="Foto de la Quinceañera" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-pink-500 shadow-lg">
+            <!-- Imagen corregida con object-cover -->
+            <img id="imagen-quinceañera" src="imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg" alt="Foto de la Quinceañera" class="w-36 h-36 object-cover rounded-full mx-auto mb-6 border-4 border-pink-500 shadow-lg">
             
-            <h1 class="text-4xl font-bold text-pink-400">¡Mis 15 Años!</h1>
-            <p class="text-gray-300 mt-2 mb-8">¡Gracias por celebrar conmigo! Comparte tus mejores momentos de la fiesta.</p>
+            <!-- Título modificado -->
+            <h1 class="font-celebration text-7xl text-pink-300">Mis 15</h1>
+            <p class="text-4xl font-bold text-white tracking-wider -mt-4">Cami Fest</p>
+            
+            <p class="text-gray-300 mt-4 mb-8">¡Gracias por celebrar conmigo! Comparte tus mejores momentos de la fiesta.</p>
 
             <div class="space-y-4">
                 <input type="file" id="photo-input" accept="image/*" multiple class="custom-file-input block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                <div id="selected-files-info" class="hidden bg-gray-800 border border-gray-700 rounded-lg p-3">
+                <div id="selected-files-info" class="hidden bg-gray-800 bg-opacity-50 border border-gray-700 rounded-lg p-3">
                     <p class="text-sm text-gray-300 mb-2">Archivos seleccionados:</p>
                     <div id="files-list" class="space-y-1"></div>
                 </div>
-                <input type="text" id="name-input" placeholder="Tu nombre (opcional)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
-                <button id="upload-button" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                <input type="text" id="name-input" placeholder="Tu nombre (opcional)" class="w-full bg-gray-800 bg-opacity-50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                <!-- Botón con animación de pulso -->
+                <button id="upload-button" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg pulsing-button">
                     <span id="upload-button-text">Subir Momentos</span>
                 </button>
             </div>
@@ -100,7 +275,7 @@
         </div>
     </div>
 
-    <div id="gallery-view" class="hidden w-full h-full p-4 md:p-6">
+    <div id="gallery-view" class="hidden w-full h-full p-4 md:p-6 relative z-20">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold text-pink-400">Galería de Momentos</h1>
@@ -224,6 +399,7 @@
             // Mostrar spinner y deshabilitar botón
             loadingSpinner.classList.remove('hidden');
             uploadButton.disabled = true;
+            uploadButton.classList.remove('pulsing-button'); // Pausar animación de pulso
             uploadButton.classList.add('opacity-50', 'cursor-not-allowed');
 
             const progressFill = document.getElementById('progress-fill');
@@ -293,6 +469,7 @@
             } finally {
                 loadingSpinner.classList.add('hidden');
                 uploadButton.disabled = false;
+                uploadButton.classList.add('pulsing-button'); // Reanudar animación de pulso
                 uploadButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 
                 // Resetear barra de progreso
@@ -432,6 +609,77 @@
 
         // Cargar configuración al iniciar
         cargarConfiguracion();
+
+        // Colores realistas para mariposas
+        const butterflyColors = [
+            { primary: '#ff9800', secondary: '#ffeb3b', pattern: '#e65100' }, // Monarca
+            { primary: '#4fc3f7', secondary: '#b3e5fc', pattern: '#0288d1' }, // Azul
+            { primary: '#e91e63', secondary: '#f8bbd0', pattern: '#ad1457' }, // Rosa
+            { primary: '#7e57c2', secondary: '#d1c4e9', pattern: '#4527a0' }, // Morado
+            { primary: '#2e7d32', secondary: '#a5d6a7', pattern: '#1b5e20' }, // Verde
+            { primary: '#ffffff', secondary: '#f5f5f5', pattern: '#e0e0e0' }  // Blanca
+        ];
+
+        // Crear mariposas dinámicamente
+        function createButterflies() {
+            const container = document.querySelector('.butterfly-container');
+            const numButterflies = 7;
+            
+            for (let i = 0; i < numButterflies; i++) {
+                const butterfly = document.createElement('div');
+                butterfly.className = 'butterfly';
+                
+                // Color aleatorio
+                const color = butterflyColors[Math.floor(Math.random() * butterflyColors.length)];
+                
+                // Cuerpo y cabeza
+                const body = document.createElement('div');
+                body.className = 'butterfly-body';
+                butterfly.appendChild(body);
+                
+                const head = document.createElement('div');
+                head.className = 'butterfly-head';
+                butterfly.appendChild(head);
+                
+                // Alas izquierdas
+                const leftWing = document.createElement('div');
+                leftWing.className = 'butterfly-wing left';
+                leftWing.style.animation = `flap ${0.3 + Math.random() * 0.2}s infinite alternate`;
+                
+                const leftWingShape = document.createElement('div');
+                leftWingShape.className = 'wing-shape';
+                leftWingShape.style.background = `linear-gradient(45deg, ${color.primary} 0%, ${color.secondary} 50%, ${color.pattern} 100%)`;
+                leftWing.appendChild(leftWingShape);
+                
+                // Alas derechas
+                const rightWing = document.createElement('div');
+                rightWing.className = 'butterfly-wing right';
+                rightWing.style.animation = `flap ${0.3 + Math.random() * 0.2}s infinite alternate`;
+                
+                const rightWingShape = document.createElement('div');
+                rightWingShape.className = 'wing-shape';
+                rightWingShape.style.background = `linear-gradient(-45deg, ${color.primary} 0%, ${color.secondary} 50%, ${color.pattern} 100%)`;
+                rightWing.appendChild(rightWingShape);
+                
+                butterfly.appendChild(leftWing);
+                butterfly.appendChild(rightWing);
+                
+                // Asignar animación de vuelo
+                const pathNum = (i % 4) + 1;
+                const duration = 15 + Math.random() * 10;
+                const delay = Math.random() * 10;
+                const scale = 0.5 + Math.random() * 0.5;
+                
+                butterfly.style.animation = `fly-path-${pathNum} ${duration}s ${delay}s infinite`;
+                butterfly.style.transform = `scale(${scale})`;
+                
+                container.appendChild(butterfly);
+            }
+        }
+
+        // Crear mariposas cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', createButterflies);
     </script>
 </body>
 </html>
+
