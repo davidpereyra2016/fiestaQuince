@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuerdos de Mis 15 Años</title>
     
-    <!-- Tailwind CSS para un diseño moderno y adaptable -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Biblioteca para generar el Código QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -49,24 +47,35 @@
         .custom-file-input:hover::before {
             opacity: 0.9;
         }
+
+        /* Estilo para la imagen del modal */
+        #modal-img {
+            max-height: 90vh; /* Ajusta la altura máxima al 90% del viewport height */
+            max-width: 90vw;  /* Ajusta el ancho máximo al 90% del viewport width */
+            width: auto;      /* Permite que el ancho se ajuste automáticamente */
+            height: auto;     /* Permite que la altura se ajuste automáticamente */
+            object-fit: contain; /* Asegura que la imagen completa sea visible */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center transition-all duration-500">
 
-    <!-- Vista Principal: Carga de Fotos -->
     <div id="upload-view" class="w-full max-w-md mx-auto p-6 md:p-8">
         <div class="text-center">
-            <!-- Puedes reemplazar esta imagen por una foto de la quinceañera -->
-            <img src="imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg" alt="Foto de la Quinceañera" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-pink-500 shadow-lg">
+            <img id="imagen-quinceañera" src="imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg" alt="Foto de la Quinceañera" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-pink-500 shadow-lg">
             
             <h1 class="text-4xl font-bold text-pink-400">¡Mis 15 Años!</h1>
             <p class="text-gray-300 mt-2 mb-8">¡Gracias por celebrar conmigo! Comparte tus mejores momentos de la fiesta.</p>
 
             <div class="space-y-4">
-                <input type="file" id="photo-input" accept="image/*" class="custom-file-input block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                <input type="file" id="photo-input" accept="image/*" multiple class="custom-file-input block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                <div id="selected-files-info" class="hidden bg-gray-800 border border-gray-700 rounded-lg p-3">
+                    <p class="text-sm text-gray-300 mb-2">Archivos seleccionados:</p>
+                    <div id="files-list" class="space-y-1"></div>
+                </div>
                 <input type="text" id="name-input" placeholder="Tu nombre (opcional)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <button id="upload-button" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
-                    Subir Momento
+                    <span id="upload-button-text">Subir Momentos</span>
                 </button>
             </div>
             
@@ -75,7 +84,11 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <p class="text-sm text-gray-400 mt-2">Subiendo foto...</p>
+                <p id="loading-text" class="text-sm text-gray-400 mt-2">Subiendo fotos...</p>
+                <div id="progress-bar" class="w-full bg-gray-700 rounded-full h-2 mt-3">
+                    <div id="progress-fill" class="bg-pink-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="progress-text" class="text-xs text-gray-500 mt-1">0 de 0 completadas</p>
             </div>
 
             <p id="feedback-message" class="mt-4 text-green-400 h-5"></p>
@@ -84,19 +97,9 @@
                 Ver Galería de Momentos
             </button>
             
-             <!-- Sección para generar el QR -->
-            <div class="mt-10 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h3 class="font-semibold text-lg mb-2">Para Imprimir el QR</h3>
-                <p class="text-sm text-gray-400 mb-4">Usa este botón para generar el QR de esta página. Luego, haz clic derecho sobre él para guardarlo e imprimirlo.</p>
-                <button id="generate-qr-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Generar mi QR</button>
-                <div id="qrcode-container" class="mt-4 flex justify-center p-4 bg-white rounded-lg hidden">
-                    <div id="qrcode"></div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Vista de la Galería -->
     <div id="gallery-view" class="hidden w-full h-full p-4 md:p-6">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-6">
@@ -106,21 +109,24 @@
                 </button>
             </div>
             <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <!-- Las imágenes se insertarán aquí dinámicamente -->
-            </div>
+                </div>
             <div id="no-photos-message" class="hidden text-center py-20">
                 <p class="text-gray-400">Aún no se han subido fotos. ¡Sé el primero!</p>
             </div>
         </div>
     </div>
     
-    <!-- Modal para ver imagen en pantalla completa -->
-    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-        <img id="modal-img" src="" class="max-w-full max-h-full rounded-lg shadow-2xl" alt="Vista ampliada">
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-8">
+        <button id="prev-button" class="absolute left-4 z-50 text-white text-6xl opacity-70 hover:opacity-100 transition-opacity inset-y-0 my-auto">
+            &#8249;
+        </button>
+        <img id="modal-img" src="" class="rounded-lg shadow-2xl transition-transform duration-300 transform scale-95" alt="Vista ampliada">
+        <button id="next-button" class="absolute right-4 z-50 text-white text-6xl opacity-70 hover:opacity-100 transition-opacity inset-y-0 my-auto">
+            &#8250;
+        </button>
         <button id="close-modal-button" class="absolute top-4 right-4 text-white text-5xl font-bold">&times;</button>
     </div>
 
-    <!-- Sistema con MySQL y PHP -->
     <script>
         // ===================================================================================
         // CONFIGURACIÓN PARA MYSQL CON PHP
@@ -144,7 +150,12 @@
         const imageModal = document.getElementById('image-modal');
         const modalImg = document.getElementById('modal-img');
         const closeModalButton = document.getElementById('close-modal-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
         
+        let fotosGaleria = [];
+        let indiceActual = 0;
+
         // Lógica de navegación entre vistas
         const mostrarGaleria = () => {
             uploadView.classList.add('hidden');
@@ -160,51 +171,135 @@
         showGalleryButton.addEventListener('click', mostrarGaleria);
         backToUploadButton.addEventListener('click', mostrarSubidor);
 
-        // Lógica para subir fotos con MySQL
+        // Mostrar archivos seleccionados
+        photoInput.addEventListener('change', function() {
+            const files = this.files;
+            const selectedFilesInfo = document.getElementById('selected-files-info');
+            const filesList = document.getElementById('files-list');
+            const uploadButtonText = document.getElementById('upload-button-text');
+
+            if (files.length > 0) {
+                selectedFilesInfo.classList.remove('hidden');
+                filesList.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'text-xs text-gray-400 flex justify-between';
+                    fileDiv.innerHTML = `
+                        <span>${file.name}</span>
+                        <span>${fileSize} MB</span>
+                    `;
+                    filesList.appendChild(fileDiv);
+                }
+                
+                uploadButtonText.textContent = files.length === 1 ? 'Subir Momento' : `Subir ${files.length} Momentos`;
+            } else {
+                selectedFilesInfo.classList.add('hidden');
+                uploadButtonText.textContent = 'Subir Momentos';
+            }
+        });
+
+        // Lógica para subir múltiples fotos
         uploadButton.addEventListener('click', async () => {
-            const archivo = photoInput.files[0];
+            const archivos = photoInput.files;
             const nombreInvitado = nameInput.value.trim() || 'Anónimo';
 
-            if (!archivo) {
-                mostrarMensaje("Por favor, selecciona una foto primero.", true);
+            if (archivos.length === 0) {
+                mostrarMensaje("Por favor, selecciona al menos una foto.", true);
                 return;
             }
 
+            // Validar tamaño total (máximo 50MB total)
+            let tamañoTotal = 0;
+            for (let i = 0; i < archivos.length; i++) {
+                tamañoTotal += archivos[i].size;
+            }
+            if (tamañoTotal > 50 * 1024 * 1024) {
+                mostrarMensaje("El tamaño total de archivos es muy grande. Máximo 50MB total.", true);
+                return;
+            }
+
+            // Mostrar spinner y deshabilitar botón
             loadingSpinner.classList.remove('hidden');
             uploadButton.disabled = true;
             uploadButton.classList.add('opacity-50', 'cursor-not-allowed');
 
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const loadingText = document.getElementById('loading-text');
+
+            let fotosSubidas = 0;
+            let errores = [];
+
+            progressText.textContent = `0 de ${archivos.length} completadas`;
+            loadingText.textContent = `Subiendo ${archivos.length} foto${archivos.length > 1 ? 's' : ''}...`;
+
             try {
-                const formData = new FormData();
-                formData.append('foto', archivo);
-                formData.append('nombre_invitado', nombreInvitado);
+                // Subir archivos uno por uno para mejor control
+                for (let i = 0; i < archivos.length; i++) {
+                    const archivo = archivos[i];
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('foto', archivo);
+                        formData.append('nombre_invitado', nombreInvitado);
 
-                const respuesta = await fetch('api.php?accion=subir_foto', {
-                    method: 'POST',
-                    body: formData
-                });
+                        const respuesta = await fetch('api.php?accion=subir_foto', {
+                            method: 'POST',
+                            body: formData
+                        });
 
-                const resultado = await respuesta.json();
+                        const resultado = await respuesta.json();
 
-                if (resultado.exito) {
-                    mostrarMensaje("¡Foto subida con éxito!", false);
+                        if (resultado.exito) {
+                            fotosSubidas++;
+                        } else {
+                            errores.push(`${archivo.name}: ${resultado.error}`);
+                        }
+
+                    } catch (error) {
+                        errores.push(`${archivo.name}: Error de conexión`);
+                    }
+
+                    // Actualizar progreso
+                    const progreso = ((i + 1) / archivos.length) * 100;
+                    progressFill.style.width = `${progreso}%`;
+                    progressText.textContent = `${i + 1} de ${archivos.length} completadas`;
+                }
+
+                // Mostrar resultado final
+                if (fotosSubidas === archivos.length) {
+                    mostrarMensaje(`¡${fotosSubidas} foto${fotosSubidas > 1 ? 's' : ''} subida${fotosSubidas > 1 ? 's' : ''} con éxito!`, false);
                     photoInput.value = '';
                     nameInput.value = '';
+                    document.getElementById('selected-files-info').classList.add('hidden');
+                    document.getElementById('upload-button-text').textContent = 'Subir Momentos';
+                    
                     // Recargar galería si está visible
                     if (!galleryView.classList.contains('hidden')) {
                         cargarGaleria();
                     }
                 } else {
-                    throw new Error(resultado.error);
+                    const mensaje = `${fotosSubidas} de ${archivos.length} fotos subidas. ${errores.length} errores.`;
+                    mostrarMensaje(mensaje, true);
+                    console.error('Errores:', errores);
                 }
 
             } catch (error) {
-                console.error("Error al subir la foto:", error);
-                mostrarMensaje(error.message || "Hubo un error al subir la foto.", true);
+                console.error("Error general:", error);
+                mostrarMensaje("Error inesperado al subir las fotos.", true);
             } finally {
                 loadingSpinner.classList.add('hidden');
                 uploadButton.disabled = false;
                 uploadButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                // Resetear barra de progreso
+                setTimeout(() => {
+                    progressFill.style.width = '0%';
+                    progressText.textContent = '0 de 0 completadas';
+                }, 2000);
             }
         });
 
@@ -224,16 +319,16 @@
                 const resultado = await respuesta.json();
 
                 if (resultado.exito) {
-                    const fotos = resultado.datos.fotos;
+                    fotosGaleria = resultado.datos.fotos; // Guardar las fotos en una variable global
                     
-                    if (fotos.length === 0) {
+                    if (fotosGaleria.length === 0) {
                         noPhotosMessage.classList.remove('hidden');
                         galleryGrid.innerHTML = '';
                     } else {
                         noPhotosMessage.classList.add('hidden');
                         galleryGrid.innerHTML = ''; // Limpiar la galería
 
-                        fotos.forEach(foto => {
+                        fotosGaleria.forEach((foto, index) => {
                             const fotoElemento = document.createElement('div');
                             fotoElemento.className = 'gallery-item relative aspect-square bg-gray-800 rounded-lg overflow-hidden cursor-pointer group';
                             
@@ -253,7 +348,8 @@
                             fotoElemento.appendChild(img);
                             fotoElemento.appendChild(overlay);
                             
-                            fotoElemento.addEventListener('click', () => abrirModal(foto.url_completa));
+                            // Añadir el evento para abrir el modal, pasando el índice
+                            fotoElemento.addEventListener('click', () => abrirModal(index));
                             
                             galleryGrid.appendChild(fotoElemento);
                         });
@@ -269,104 +365,73 @@
         }
 
         // Lógica del Modal
-        function abrirModal(urlImagen) {
-            modalImg.src = urlImagen;
+        function abrirModal(index) {
+            indiceActual = index;
+            modalImg.src = fotosGaleria[indiceActual].url_completa;
             imageModal.classList.remove('hidden');
+            actualizarBotonesNavegacion();
         }
 
         function cerrarModal() {
             imageModal.classList.add('hidden');
             modalImg.src = '';
         }
+        
+        // Funciones para navegar en el modal
+        function mostrarFotoAnterior() {
+            indiceActual--;
+            if (indiceActual < 0) {
+                indiceActual = fotosGaleria.length - 1; // Volver a la última
+            }
+            modalImg.src = fotosGaleria[indiceActual].url_completa;
+            actualizarBotonesNavegacion();
+        }
+
+        function mostrarFotoSiguiente() {
+            indiceActual++;
+            if (indiceActual >= fotosGaleria.length) {
+                indiceActual = 0; // Volver a la primera
+            }
+            modalImg.src = fotosGaleria[indiceActual].url_completa;
+            actualizarBotonesNavegacion();
+        }
+
+        function actualizarBotonesNavegacion() {
+            if (fotosGaleria.length <= 1) {
+                prevButton.classList.add('hidden');
+                nextButton.classList.add('hidden');
+            } else {
+                prevButton.classList.remove('hidden');
+                nextButton.classList.remove('hidden');
+            }
+        }
 
         closeModalButton.addEventListener('click', cerrarModal);
+        prevButton.addEventListener('click', mostrarFotoAnterior);
+        nextButton.addEventListener('click', mostrarFotoSiguiente);
+
         imageModal.addEventListener('click', (e) => {
             if (e.target === imageModal) {
                 cerrarModal();
             }
         });
         
-        // Lógica del generador de QR con MySQL
-        const generateQrButton = document.getElementById('generate-qr-button');
-        const qrcodeContainer = document.getElementById('qrcode-container');
-        const qrcodeDiv = document.getElementById('qrcode');
-        let qrGenerado = false;
-        
-        // Verificar si ya hay un QR activo al cargar la página
-        window.addEventListener('load', async () => {
+        // Cargar configuración del sitio al iniciar
+        async function cargarConfiguracion() {
             try {
-                const url = window.location.href;
-                const respuesta = await fetch(`api.php?accion=verificar_qr&url=${encodeURIComponent(url)}`);
+                const respuesta = await fetch('api.php?accion=obtener_configuracion&clave=imagen_quinceañera');
                 const resultado = await respuesta.json();
                 
-                if (resultado.exito && resultado.datos.qr_activo) {
-                    // Si ya hay un QR activo, ocultar el botón de generar
-                    generateQrButton.style.display = 'none';
-                    qrGenerado = true;
+                if (resultado.exito && resultado.datos.valor) {
+                    document.getElementById('imagen-quinceañera').src = resultado.datos.valor;
                 }
             } catch (error) {
-                console.error("Error al verificar QR:", error);
+                console.error('Error al cargar configuración:', error);
             }
-        });
-        
-        generateQrButton.addEventListener('click', async () => {
-            if (qrGenerado) return;
-            
-            const url = window.location.href;
-            
-            try {
-                // Registrar el QR en la base de datos
-                const formData = new FormData();
-                formData.append('url', url);
-                
-                const respuesta = await fetch('api.php?accion=generar_qr', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const resultado = await respuesta.json();
-                
-                if (resultado.exito) {
-                    // Generar el QR visualmente
-                    qrcodeDiv.innerHTML = ''; // Limpiar QR anterior
-                    new QRCode(qrcodeDiv, {
-                        text: url,
-                        width: 128,
-                        height: 128,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    qrcodeContainer.classList.remove('hidden');
-                    
-                    // Ocultar el botón después de generar
-                    generateQrButton.style.display = 'none';
-                    qrGenerado = true;
-                    
-                    // Marcar como usado después de 30 segundos (opcional)
-                    setTimeout(async () => {
-                        try {
-                            const formDataUso = new FormData();
-                            formDataUso.append('url', url);
-                            await fetch('api.php?accion=marcar_qr_usado', {
-                                method: 'POST',
-                                body: formDataUso
-                            });
-                        } catch (error) {
-                            console.error("Error al marcar QR como usado:", error);
-                        }
-                    }, 30000);
-                    
-                } else {
-                    throw new Error(resultado.error);
-                }
-                
-            } catch (error) {
-                console.error("Error al generar QR:", error);
-                mostrarMensaje("Error al generar el código QR.", true);
-            }
-        });
+        }
+
+        // Cargar configuración al iniciar
+        cargarConfiguracion();
     </script>
 </body>
 </html>
-

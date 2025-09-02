@@ -1,5 +1,5 @@
--- Script SQL para crear la base de datos de Fiesta de Quince Años
--- Ejecutar este script en phpMyAdmin o MySQL Workbench
+-- Script completo para configurar la base de datos local
+-- Ejecutar en phpMyAdmin o MySQL Workbench
 
 -- Crear la base de datos
 CREATE DATABASE IF NOT EXISTS fiesta_quince 
@@ -25,7 +25,7 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci 
 COMMENT='Tabla para almacenar las fotos de la galería de la fiesta';
 
--- Tabla para los códigos QR generados
+-- Tabla para los códigos QR generados (con campo imagen_qr incluido)
 CREATE TABLE IF NOT EXISTS codigos_qr (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID único del código QR',
     codigo_qr TEXT NOT NULL COMMENT 'Código QR generado',
@@ -42,14 +42,27 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci 
 COMMENT='Tabla para controlar los códigos QR generados';
 
--- Insertar algunos datos de ejemplo (opcional)
--- INSERT INTO fotos_galeria (nombre_archivo, url_imagen, nombre_invitado) VALUES
--- ('ejemplo1.jpg', 'imagenes/ejemplo1.jpg', 'María García'),
--- ('ejemplo2.jpg', 'imagenes/ejemplo2.jpg', 'Juan Pérez');
+-- Tabla para configuración del sitio (imagen de quinceañera, etc.)
+CREATE TABLE IF NOT EXISTS configuracion_sitio (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID único de configuración',
+    clave VARCHAR(100) NOT NULL UNIQUE COMMENT 'Clave de configuración',
+    valor TEXT NOT NULL COMMENT 'Valor de la configuración',
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de última actualización',
+    INDEX idx_clave (clave)
+) ENGINE=InnoDB 
+DEFAULT CHARSET=utf8mb4 
+COLLATE=utf8mb4_unicode_ci 
+COMMENT='Tabla para configuraciones del sitio';
 
--- Mostrar las tablas creadas
+-- Insertar configuración por defecto para imagen de quinceañera
+INSERT INTO configuracion_sitio (clave, valor) VALUES 
+('imagen_quinceañera', 'imagenes/2025-09-01_20-03-39_68b5dffbe2f8b.jpeg')
+ON DUPLICATE KEY UPDATE valor = VALUES(valor);
+
+-- Verificar que las tablas se crearon correctamente
 SHOW TABLES;
 
--- Mostrar la estructura de las tablas
+-- Mostrar estructura de las tablas
 DESCRIBE fotos_galeria;
 DESCRIBE codigos_qr;
+DESCRIBE configuracion_sitio;
